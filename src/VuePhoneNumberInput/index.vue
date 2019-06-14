@@ -51,7 +51,8 @@
 </template>
 <script>
   /* eslint-disable */
-  import { countries, countriesIso } from './assets/js/phoneCodeCountries.js'
+  import { countriesIso } from './assets/js/phoneCodeCountriesEn.js'
+  import phoneCode from './assets/js/phoneCode'
   import examples from 'libphonenumber-js/examples.mobile.json'
   import { parsePhoneNumberFromString, AsYouType, getExampleNumber } from 'libphonenumber-js'
   import VueInputUI from 'vue-input-ui'
@@ -77,6 +78,7 @@
       VueInputUI,
       CountrySelector
     },
+    mixins: [phoneCode],
     props: {
       value: { type: String, default: null },
       id: { type: String, default: 'VuePhoneNumberInput' },
@@ -95,7 +97,8 @@
       noFlags: { type: Boolean, default: false },
       error: { type: Boolean, default: false },
       noExample: { type: Boolean, default: false },
-      required: { type: Boolean, default: false }
+      required: { type: Boolean, default: false },
+      lang: { type: String, default: 'en' },
     },
     data () {
       return {
@@ -111,12 +114,12 @@
         }
       },
       codesCountries () {
-        return countries
+        return this.getTranslateCountries(this.lang)
       },
       locale () {
         const locale = this.defaultCountryCode || (!this.noUseBrowserLocale ? browserLocale() : null)
         const countryAvailable = isCountryAvailable(locale)
-        
+
         if (countryAvailable && locale) {
           this.countryCode = locale
         } else if (!countryAvailable && this.defaultCountryCode) {
@@ -129,7 +132,7 @@
         get () {
           return this.results.countryCode || this.locale
         },
-        set (newCountry) { 
+        set (newCountry) {
           this.emitValues({countryCode: newCountry, phoneNumber: this.phoneNumber})
           if (this.focusInput) {
             this.$refs.PhoneNumberInput.$el.querySelector('input').focus()
@@ -179,7 +182,7 @@
           countryCode: countryCode,
           isValid: false,
           ...( parsing
-            ? { 
+            ? {
               formattedNumber: parsing.number,
               nationalNumber: parsing.nationalNumber,
               isValid: parsing.isValid(),
@@ -234,7 +237,7 @@
     }
     .select-country-container {
       .input-country-selector input {
-        border-top-right-radius: 0 !important; 
+        border-top-right-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
       }
     }
